@@ -13,9 +13,9 @@ class App extends Component {
     super(props);
     this.state = {
         data: [
-            {name: 'John S.', salary: 800, increase: true, id: 1},
-            {name: 'Jacob B.', salary: 1000, increase: false, id: 2},
-            {name: 'Bob M.', salary: 1700, increase: true, id: 3}
+            {name: 'John S.', salary: 800, increase: true, rise: true, id: 1},
+            {name: 'Jacob B.', salary: 1000, increase: false, rise: false, id: 2},
+            {name: 'Bob M.', salary: 1700, increase: true, rise: false, id: 3}
         ]
     }
     this.maxId  = 4
@@ -30,27 +30,59 @@ class App extends Component {
    }
 
    addItem = (name, salary) => {
-        const newItem = {name, salary, increase: false, id: this.maxId++}
+        const newItem = {name, salary, increase: false, rise: false, id: this.maxId++}
         this.setState(({data}) => {
             const newArr = [...data, newItem]
             return {data: newArr}
         })
    }
 
+   onToggleProp = (id, prop) => {
+        // this.setState(({data}) => {
+        //     const index = data.findIndex(elem => elem.id === id);
+
+        //     const old = data[index];
+        //     const newItem = {...old, increase: !old.increase};
+        //     const newArr = [...data.slice(0, index), newItem, ...data.slice(index+1)];
+
+        //     return {
+        //         data: newArr
+        //     }
+        // })
+
+        this.setState(({data}) => ({
+            data: data.map(item => {
+                if(item.id === id) {
+                    return {...item, [prop]: !item[prop]};
+                }
+                return item;
+            })
+        }))
+
+   }
+
     render() {
         const {data} = this.state;
-
+        const sumEmployees = data.length;
+        const employeesWidthIncrease = data.filter(item => item.increase).length;
         return (
             <div className="app">
-                <AppInfo/>
+                <AppInfo 
+                    sumEmployees={sumEmployees}
+                    employeesWithIncrease={employeesWidthIncrease}
+                    />
 
                 <div className="search-panel">
                     <SearchPanel/>
                     <AppFilter/>
                 </div>
-
-                <EmployeesList data={data} onDelete={this.deleteItem}/>
+            
+                <EmployeesList 
+                    data={data} 
+                    onDelete={this.deleteItem}
+                    onToggleProp={this.onToggleProp}/>
                 <EmployeesAddForm onAdd={this.addItem}/>
+
             </div>
         );
    }
